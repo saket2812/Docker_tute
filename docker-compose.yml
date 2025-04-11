@@ -1,0 +1,18 @@
+version: '3'
+services:
+  backend:
+    build: ./Backend
+    ports:
+      - "5000:5000"
+    
+
+  frontend:
+    build: ./Frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    
+
+networks:
+  app-network:
