@@ -1,9 +1,10 @@
 from flask import Flask, request, jsonify
 import json
 import os
+from flask_cors import CORS
 
 app = Flask(__name__)
-
+CORS(app)
 DATA_FILE = 'data.json'
 
 @app.route('/')
@@ -27,10 +28,13 @@ def get_data():
 @app.route('/submit', methods=['POST'])
 def submit_data():
     try:
-        new_data = {
-            "id": request.form.get("id"),
-            "name": request.form.get("name")
-        }
+        if request.is_json:
+            new_data = request.get_json()
+        else:
+            new_data = {
+                "id": request.form.get("id"),
+                "name": request.form.get("name")
+            }
 
         with open('data.json', 'r') as file:
             data = json.load(file)
