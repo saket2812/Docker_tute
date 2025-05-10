@@ -6,7 +6,7 @@
 </head>
 <body>
   <h2>Submit Data to Flask Backend</h2>
-  <form method="POST" action="/submit">
+  <form id="dataForm" method="POST" action="/submit">
     <input type="text" name="id" />
     <input type="text" name="name" />
     <button type="submit">Submit</button>
@@ -16,23 +16,29 @@
   <script>
     const form = document.getElementById('dataForm');
     form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+        e.preventDefault();
 
-      const formData = new FormData(form);
-      const data = {
-        id: formData.get('id'),
-        name: formData.get('name')
-      };
+        const formData = new FormData(form);
+        const data = {
+            id: formData.get('id'),
+            name: formData.get('name')
+        };
 
-      const response = await fetch('http://localhost:5000/api', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
+        try {
+            const response = await fetch('http://localhost:5000/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
 
-      const result = await response.json();
-      alert(result.message || 'Something went wrong!');
+            const result = await response.json();
+            alert(result.message || 'Something went wrong!');
+        } catch (error) {
+            console.error("Error:", error);
+            alert('Failed to send data.');
+        }
     });
+
   </script>
 </body>
 </html>

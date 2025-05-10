@@ -4,19 +4,21 @@ import os
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
-DATA_FILE = 'data.json'
+
+# Allow all origins for CORS, you can also restrict to specific origins
+CORS(app, origins=["http://localhost:3000"], methods=["GET", "POST", "OPTIONS"])
+
+DATA_FILE = os.path.join(os.path.dirname(__file__), 'data.json')
 
 @app.route('/')
 def hellow():
     return "Welcome to the API. To view data, use the /api endpoint."
 
-# GET endpoint to return all data
 @app.route('/api', methods=['GET'])
 def get_data():
     try:
         if not os.path.exists(DATA_FILE):
-            return jsonify([])  # Return empty list if file not found
+            return jsonify([])
 
         with open(DATA_FILE, 'r') as file:
             data = json.load(file)
@@ -24,7 +26,6 @@ def get_data():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# POST endpoint to accept new item
 @app.route('/submit', methods=['POST'])
 def submit_data():
     try:
@@ -36,18 +37,21 @@ def submit_data():
                 "name": request.form.get("name")
             }
 
-        with open('data.json', 'r') as file:
+        if not os.path.exists(DATA_FILE):
+            with open(DATA_FILE, 'w') as f:
+                json.dump([], f)
+
+        with open(DATA_FILE, 'r') as file:
             data = json.load(file)
 
         data.append(new_data)
 
-        with open('data.json', 'w') as file:
+        with open(DATA_FILE, 'w') as file:
             json.dump(data, file, indent=4)
 
         return jsonify({"message": "Data added successfully!"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
